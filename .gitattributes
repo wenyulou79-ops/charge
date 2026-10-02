@@ -1,0 +1,9 @@
+# 统一换行符：仓库内一律用 LF，检出到 Windows 时由 git 自行处理。
+# 不加这个，Windows 下提交会把每个文件都写成 CRLF，diff 里全是噪声。
+* text=auto eol=lf
+
+# 二进制
+*.png binary
+*.jpg binary
+*.tgz binary
+*.ico binary

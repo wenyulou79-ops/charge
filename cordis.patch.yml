@@ -1,0 +1,6 @@
+# dsh-live-cost-meter 组合包补丁：向目标 profile 插入一条宿主插件行。
+# 行名即包名，由 profile 自身的 node_modules 解析
+# （`dsh plugin --profile <name> add <path>` 安装本包后生效）。
+- insert:
+    - id: cost-meter
+      name: dsh-live-cost-meter

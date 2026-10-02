@@ -1,0 +1,56 @@
+name: CI
+
+# 只跑「不需要 DSH 运行时、也不需要 API Key」的测试。
+# 需要真实 DSH 安装或账户数据的测试会自动跳过（见 test/_env.mjs），
+# 因此公开仓库里不会因为缺少私有环境而出现假失败。
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22', '24']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Syntax check
+        run: |
+          for f in lib/*.js; do node --check "$f"; done
+          for f in test/*.mjs; do node --check "$f"; done
+
+      - name: Pure-function tests (pricing, tiers, model names, balance parsing)
+        run: node test/verify.mjs
+
+      - name: Balance resilience (timeout, anchor, staleness, reconciliation)
+        run: node test/balance-resilience.mjs
+
+      - name: Balance tracking end-to-end (follows official, recovers from hangs)
+        run: node test/balance-tracking.mjs
+
+      - name: Adversarial suites
+        run: |
+          node test/verifier-money.mjs
+          node test/verifier-tier.mjs
+          node test/verifier-projection.mjs
+          node test/verifier-host.mjs
+          node test/verifier-client.mjs
+          node test/verifier-balance.mjs
+
+      - name: Skip-check (DSH-dependent suites must skip, not fail)
+        run: |
+          node test/projection.mjs
+          node test/convention-lock.mjs
+          node test/check-balance.mjs

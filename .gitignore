@@ -1,0 +1,19 @@
+# 依赖与构建产物
+node_modules/
+*.tgz
+dist/
+
+# 测试期间产生的临时 HOME（内含账本，绝不能提交）
+test/.tmp-*/
+.tmp-*/
+
+# 本地账本与凭据：本插件只写 $DSH_HOME，但万一有人把 HOME 指到仓库内
+ledger.json
+.credentials.yaml
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
